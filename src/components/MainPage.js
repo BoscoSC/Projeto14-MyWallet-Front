@@ -1,10 +1,20 @@
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import useApp from "../context/useApp";
+import Card from "./Card";
+
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { BsPlusCircle, BsDashCircle } from "react-icons/bs";
 
 export default function MainPage() {
+  const { loadStatement, name, totalBalance, statement } = useApp();
+
   const navigate = useNavigate();
+
+  const navigateToSignIn = () => {
+    navigate("/");
+  };
 
   const navigateToEntry = () => {
     navigate("/entry");
@@ -14,15 +24,36 @@ export default function MainPage() {
     navigate("/withdraw");
   };
 
+  useEffect(() => {
+    loadStatement();
+  }, []);
+
   return (
     <Page>
       <Topper>
-        <p>Olá, Fulano</p>
-        <RiLogoutBoxRLine />
+        <p>Olá, {name}</p>
+        <RiLogoutBoxRLine onClick={navigateToSignIn} />
       </Topper>
-
       <Content>
-        <p>Não há registros de entrada ou saída</p>
+        <div>
+          {statement.lenght > 0 ? (
+            <p>Não há registros de entrada ou saída</p>
+          ) : (
+            statement.map((item, index) => (
+              <Card
+                key={index + 1}
+                day={item.day}
+                description={item.description}
+                value={item.value}
+                type={item.type}
+              />
+            ))
+          )}
+        </div>
+        <TotalMoney total={totalBalance}>
+          <h3>SALDO</h3>
+          <p>99999</p>
+        </TotalMoney>
       </Content>
 
       <Bottom onClick={navigateToEntry}>
@@ -71,9 +102,9 @@ const Content = styled.div`
   width: 100%;
   height: 70vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 100px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 25px 10px 10px 10px;
   background: #ffffff;
   border-radius: 5px;
 
@@ -106,5 +137,21 @@ const Button = styled.div`
   padding: 15px;
   svg {
     font-size: 20px;
+  }
+`;
+
+const TotalMoney = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  h3 {
+    color: #000000;
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  p {
+    font-size: 17px;
+    color: ${(props) => (props.total >= 0 ? "#03AC00" : "#C70000")};
   }
 `;

@@ -1,22 +1,77 @@
-import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+
+import logo from "../assets/logo.png";
 
 export default function SignUp() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
   const navigateToSignIn = () => {
     navigate("/");
   };
 
+  function register(event) {
+    event.preventDefault();
+
+    if (password === confirmPassword) {
+      const URL = "http://localhost:5000/register";
+      const body = {
+        name: name,
+        email: email,
+        password: password,
+      };
+
+      const promise = axios.post(URL, body);
+
+      promise.then(() => {
+        alert("register success");
+        navigateToSignIn();
+      });
+
+      promise.catch((error) => alert(error.response.data.message));
+    } else {
+      alert("As senhas não batem");
+    }
+  }
+
   return (
     <Page>
       <img src={logo} alt="" />
-      <form>
-        <Input required type="text" placeholder="Nome" />
-        <Input required type="email" placeholder="E-mail" />
-        <Input required type="password" placeholder="Senha" />
-        <Input required type="password" placeholder="Confirme a senha" />
+      <form onSubmit={register}>
+        <Input
+          required
+          type="text"
+          placeholder="Nome"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Input
+          required
+          type="email"
+          placeholder="E-mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Input
+          required
+          type="password"
+          placeholder="Senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Input
+          required
+          type="password"
+          placeholder="Confirme a senha"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
         <Button type="submit">Cadastrar</Button>
       </form>
       <SignIn onClick={navigateToSignIn}>Já tem uma conta? Entre agora!</SignIn>
